@@ -1,4 +1,4 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, computed, effect, signal } from '@angular/core';
 import { FilterType, TodoModel } from '../../models/todo';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms'
 import { Title } from '@angular/platform-browser';
@@ -11,34 +11,37 @@ import { Title } from '@angular/platform-browser';
 })
 export class TodooComponent {
   todolist = signal<TodoModel[]>([
-    {
-      id: 1,
-      title: 'buy milk',
-      completed: false,
-      editing: false
-    },
-    {
-      id: 2,
-      title: 'buy milk',
-      completed: true,
-      editing: false
-    }
+
   ])
 
 
+  constructor() {
+    effect(() => {
+      localStorage.setItem('todos', JSON.stringify(this.todolist()))
+    })
+  }
+
+
+  ngOnInit(): void {
+    const storage = localStorage.getItem('todos')
+    if (storage) {
+      this.todolist.set(JSON.parse(storage))
+    }
+  }
+
   filter = signal<FilterType>('all')
 
-  todosListFiltered = computed(()=> {
+  todosListFiltered = computed(() => {
     const filter = this.filter()
     const todos = this.todolist()
 
 
-    switch(filter){
+    switch (filter) {
       case 'active':
-        return todos.filter((todo)=> !todo.completed)
+        return todos.filter((todo) => !todo.completed)
 
       case 'completed':
-        return todos.filter((todo)=> todo.completed)
+        return todos.filter((todo) => todo.completed)
 
       default:
         return todos
