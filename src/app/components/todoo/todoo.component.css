@@ -15,7 +15,7 @@
 }
 
 .new-todo button {
-  @apply absolute right-0 bg-backgraund-400 text-lg font-black h-full px-2
+  @apply absolute right-0 bg-backgraund-400 text-lg font-black h-full px-5
 }
 
 
