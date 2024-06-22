@@ -1,35 +1,23 @@
-import { Component, computed, effect, signal } from '@angular/core';
+import { Component, OnInit, computed, effect, signal } from '@angular/core';
 import { FilterType, TodoModel } from '../../models/todo';
-import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms'
-import { Title } from '@angular/platform-browser';
+import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
+import { TodoService } from '../../todo.service';
+
 @Component({
   selector: 'app-todoo',
   standalone: true,
   imports: [ReactiveFormsModule],
   templateUrl: './todoo.component.html',
-  styleUrl: './todoo.component.css'
+  styleUrls: ['./todoo.component.css']
 })
-export class TodooComponent {
-  todolist = signal<TodoModel[]>([
+export class TodooComponent implements OnInit {
+  todolist = signal<TodoModel[]>([]);
+  filter = signal<FilterType>('all');
+  newTodo = new FormControl('', {
+    nonNullable: true,
+    validators: [Validators.required, Validators.minLength(3)]
+  });
 
-  ])
-
-
-  constructor() {
-    effect(() => {
-      localStorage.setItem('todos', JSON.stringify(this.todolist()))
-    })
-  }
-
-
-  ngOnInit(): void {
-    const storage = localStorage.getItem('todos')
-    if (storage) {
-      this.todolist.set(JSON.parse(storage))
-    }
-  }
-
-  filter = signal<FilterType>('all')
 
   todosListFiltered = computed(() => {
     const filter = this.filter()
@@ -48,62 +36,61 @@ export class TodooComponent {
     }
   })
 
-  newTodo = new FormControl('', {
-    nonNullable: true,
-    validators: [Validators.required, Validators.minLength(3)]
-  })
+  constructor(private todoService: TodoService) {}
+
+  ngOnInit(): void {
+    this.todoService.getTodos().subscribe(todos => {
+      this.todolist.set(todos);
+    });
+  }
 
   changeFilter(filterString: FilterType) {
-    this.filter.set(filterString)
+    this.filter.set(filterString);
   }
 
   addTodo() {
     const newTodoTitle = this.newTodo.value.trim();
     if (this.newTodo.valid && newTodoTitle !== '') {
-      this.todolist.update((prev_todos) => [
-        ...prev_todos,
-        { id: Date.now(), title: newTodoTitle, completed: false, editing: false }
-      ]);
+      const newTodo: TodoModel = {
+        id: Date.now(),
+        title: newTodoTitle,
+        completed: false,
+        editing: false
+      };
 
-      this.newTodo.reset()
-    } else {
-      this.newTodo.reset()
+      this.todoService.addTodo(newTodo).subscribe(todo => {
+        this.todolist.update(prevTodos => [...prevTodos, todo]);
+        this.newTodo.reset();
+      });
     }
   }
 
   toggleTodo(todoId: number) {
-    this.todolist.update((prev_todos) =>
-      prev_todos.map(todo => {
-        return todo.id === todoId
-          ? { ...todo, completed: !todo.completed }
-          : todo
-      })
-    );
+    const todo = this.todolist().find(todo => todo.id === todoId);
+    if (todo) {
+      this.todoService.updateTodo({ ...todo, completed: !todo.completed }).subscribe(updatedTodo => {
+        this.todolist.update(prevTodos => prevTodos.map(t => t.id === todoId ? updatedTodo : t));
+      });
+    }
   }
 
-
   removeTodo(todoId: number) {
-    this.todolist.update((prev_todos) => prev_todos.filter((todo) => todo.id !== todoId))
+    this.todoService.deleteTodo(todoId).subscribe(() => {
+      this.todolist.update(prevTodos => prevTodos.filter(todo => todo.id !== todoId));
+    });
   }
 
   updateTodoEditingModel(todoId: number) {
-    return this.todolist.update((prev_todos) =>
-      prev_todos.map((todo) => {
-        return todo.id === todoId ?
-          { ...todo, editing: true } :
-          { ...todo, editing: false }
-      })
-    )
+    this.todolist.update(prevTodos => prevTodos.map(todo => todo.id === todoId ? { ...todo, editing: true } : { ...todo, editing: false }));
   }
 
   saveTitleTodo(todoId: number, event: Event) {
-    const title = (event.target as HTMLInputElement).value
-    return this.todolist.update((prev_todos) => prev_todos.map((todo) => {
-      return todo.id === todoId ? { ...todo, title: title, editing: false } : todo
-    }))
+    const title = (event.target as HTMLInputElement).value;
+    const todo = this.todolist().find(todo => todo.id === todoId);
+    if (todo) {
+      this.todoService.updateTodo({ ...todo, title, editing: false }).subscribe(updatedTodo => {
+        this.todolist.update(prevTodos => prevTodos.map(t => t.id === todoId ? updatedTodo : t));
+      });
+    }
   }
-
 }
-
-
-
