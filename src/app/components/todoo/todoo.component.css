@@ -1,63 +1,91 @@
+
+body {
+  background: linear-gradient(135deg, #1e1e2f, #252540);
+  font-family: 'Inter', sans-serif;
+  color: #ffffff;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 20px;
+}
+
 .todoolist-wrapper {
-  @apply bg-backgraund-200 p-8 w-fit mt-8 mx-auto rounded-lg;
+  @apply bg-gray-800 p-10 w-full max-w-3xl mt-12 mx-auto rounded-2xl shadow-2xl;
+  border: 2px solid #333;
+  backdrop-filter: blur(10px);
+  background: rgba(30, 30, 47, 0.8);
 }
 
 .title {
-  @apply text-3xl font-bold text-center mb-4
+  @apply text-4xl font-extrabold text-center mb-6 text-gray-100;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
 }
 
 .new-todo {
-  @apply relative flex items-center rounded-lg overflow-hidden
+  @apply relative flex items-center rounded-xl overflow-hidden shadow-md mb-6;
 }
 
 .new-todo input {
-  @apply w-64 p-2 rounded-lg bg-backgraund-300
+  @apply w-full p-4 rounded-xl bg-gray-700 border border-gray-600 focus:border-blue-400 focus:outline-none text-gray-300;
+  transition: background-color 0.3s ease;
+}
+
+.new-todo input:focus {
+  background-color: #3b3b5c;
 }
 
 .new-todo button {
-  @apply absolute right-0 bg-backgraund-400 text-lg font-black h-full px-5
+  @apply absolute right-0 bg-blue-500 text-white text-lg font-bold h-full px-6 hover:bg-blue-600 transition-colors duration-300;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
 }
-
 
 .filters {
-  @apply flex justify-end gap-2 my-2
+  @apply flex justify-end gap-4 my-4;
 }
 
-
 .filters button {
-  @apply px-2 rounded-lg bg-backgraund-300
+  @apply px-4 py-2 rounded-xl bg-gray-700 hover:bg-gray-600 transition-colors duration-300 text-gray-300;
 }
 
 .filters button.active {
-  @apply bg-backgraund-400
+  @apply bg-blue-500 text-white;
 }
 
-
+/* Lista de tareas */
 .todo-list {
-  @apply flex flex-col gap-2
+  @apply flex flex-col gap-4;
 }
-
 
 .todo-list li {
-  @apply flex bg-backgraund-300 px-4 py-2 rounded-lg items-center gap-2
+  @apply flex bg-gray-700 px-6 py-4 rounded-xl items-center gap-4 shadow-md hover:shadow-lg transition-shadow duration-300 text-gray-300;
+  border-left: 4px solid transparent;
+  transition: border-color 0.3s ease;
+}
+
+.todo-list li:hover {
+  border-color: #3b82f6;
 }
 
 .todo-list li.todo label {
-  @apply flex-1
+  @apply flex-1;
 }
 
 .todo-list li.todo:hover button {
-  @apply block
+  @apply block;
 }
 
-.todo-list li.todo button{
-  @apply hidden text-xs
+.todo-list li.todo button {
+  @apply hidden text-xs text-red-500 hover:text-red-700 transition-colors duration-300;
 }
 
-.todo-list li.todo input[type = "checkbox"]{
-  @apply w-4 h-4 cursor-pointer
+.todo-list li.todo input[type="checkbox"] {
+  @apply w-5 h-5 cursor-pointer accent-blue-500;
 }
 
-.todo-list li.todo-editing  input[type="text"]{
-  @apply w-full bg-backgraund-400  rounded-lg px-2 outline-none
+.todo-list li.todo-editing input[type="text"] {
+  @apply w-full bg-gray-600 border border-gray-500 rounded-xl px-4 py-2 outline-none focus:border-blue-400 text-gray-300;
 }
