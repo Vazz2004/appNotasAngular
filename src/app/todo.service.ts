@@ -8,7 +8,7 @@ import { TodoModel } from "./models/todo";
 })
 
 export class TodoService {
-  private apiUrl = 'http://localhost:8000/api/todos'
+  private apiUrl = 'https://monkfish-app-kipfj.ondigitalocean.app/api/todos'
   constructor(private http: HttpClient) { }
 
   getTodos(): Observable<TodoModel[]> {
